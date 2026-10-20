@@ -1,0 +1,1873 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Banking by RWA (Shobhit Sir) - Custom Mission Tracker</title>
+  <style>
+    :root {
+      --bg-primary: #0a0f1d;
+      --bg-secondary: #131b2e;
+      --bg-card: #182238;
+      --bg-card-hover: #1f2d4a;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #cbd5e1;
+      --border-color: #24324f;
+      --border-highlight: #3b82f6;
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.3);
+      --accent-gold: #f59e0b;
+      --accent-gold-glow: rgba(245, 158, 11, 0.25);
+      --accent-blue: #3b82f6;
+      --accent-indigo: #6366f1;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --cell-bg: #131b2e;
+      --cell-hover: #1c2742;
+      --sticky-shadow: rgba(0, 0, 0, 0.5);
+      --badge-bg: #1e293b;
+      --badge-text: #e2e8f0;
+      --transition-fast: 0.18s ease;
+    }
+
+    html.light {
+      --bg-primary: #f1f5f9;
+      --bg-secondary: #ffffff;
+      --bg-card: #ffffff;
+      --bg-card-hover: #f8fafc;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-sub: #334155;
+      --border-color: #e2e8f0;
+      --border-highlight: #94a3b8;
+      --accent-green: #059669;
+      --accent-green-glow: rgba(5, 150, 105, 0.2);
+      --accent-gold: #d97706;
+      --accent-gold-glow: rgba(217, 119, 6, 0.2);
+      --accent-blue: #2563eb;
+      --accent-indigo: #4f46e5;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --cell-bg: #ffffff;
+      --cell-hover: #f1f5f9;
+      --sticky-shadow: rgba(0, 0, 0, 0.1);
+      --badge-bg: #e2e8f0;
+      --badge-text: #1e293b;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Inter", "Helvetica Neue", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+      overflow-x: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.25rem 1rem 3.5rem 1rem;
+    }
+
+    /* Routine Switcher Top Bar */
+    .routine-switcher-bar {
+      background: linear-gradient(90deg, var(--bg-secondary), var(--bg-card));
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 0.75rem 1.15rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    }
+
+    .switcher-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .switcher-label {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+    }
+
+    .routine-select {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      border: 1px solid var(--border-highlight);
+      border-radius: 0.5rem;
+      padding: 0.45rem 0.85rem;
+      font-size: 0.9rem;
+      font-weight: 700;
+      outline: none;
+      cursor: pointer;
+      min-width: 240px;
+    }
+
+    .date-range-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      font-weight: 600;
+      padding: 0.3rem 0.7rem;
+      border-radius: 0.45rem;
+      background-color: rgba(16, 185, 129, 0.12);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .header-bar {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1.5rem;
+      margin-bottom: 1.75rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-title-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .mission-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      width: fit-content;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 0.25rem 0.65rem;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.18), rgba(99, 102, 241, 0.18));
+      color: #60a5fa;
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      margin-bottom: 0.15rem;
+    }
+
+    .main-heading {
+      font-size: 1.95rem;
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .main-heading .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #34d399 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .motivational-quote {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      text-shadow: 0 0 15px var(--accent-gold-glow);
+    }
+
+    .btn-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.45rem;
+      padding: 0.5rem 0.9rem;
+      font-size: 0.84rem;
+      font-weight: 600;
+      border-radius: 0.55rem;
+      border: 1px solid var(--border-color);
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      user-select: none;
+    }
+
+    .btn:hover {
+      background-color: var(--bg-card-hover);
+      border-color: var(--border-highlight);
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background-color: var(--accent-blue);
+      color: #ffffff;
+      border-color: transparent;
+    }
+
+    .btn-primary:hover {
+      background-color: #2563eb;
+      color: #ffffff;
+    }
+
+    .btn-create {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      border: none;
+      box-shadow: 0 0 12px var(--accent-green-glow);
+    }
+
+    .btn-create:hover {
+      background: linear-gradient(135deg, #059669, #047857);
+      color: #ffffff;
+    }
+
+    .btn-danger {
+      color: #f87171;
+    }
+
+    .btn-danger:hover {
+      background-color: rgba(239, 68, 68, 0.15);
+      border-color: var(--danger);
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .metric-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 1.15rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.45rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      position: relative;
+    }
+
+    .metric-title {
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--text-muted);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .metric-value-row {
+      display: flex;
+      align-items: baseline;
+      gap: 0.45rem;
+    }
+
+    .metric-big-number {
+      font-size: 1.75rem;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .metric-small-sub {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .progress-bar-bg {
+      width: 100%;
+      height: 7px;
+      background-color: var(--border-color);
+      border-radius: 9999px;
+      overflow: hidden;
+      margin-top: 0.35rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #10b981 0%, #34d399 100%);
+      border-radius: 9999px;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 0%;
+    }
+
+    .subject-stat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 0.75rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .subject-stat-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.65rem;
+      padding: 0.75rem 0.85rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+    }
+
+    .subject-stat-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      gap: 0.25rem;
+    }
+
+    .subject-stat-val {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .subject-mini-fill {
+      height: 4px;
+      border-radius: 9999px;
+      background: var(--accent-blue);
+      transition: width 0.25s ease;
+      width: 0%;
+    }
+
+    .controls-panel {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.75rem;
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      padding: 0.35rem 0.75rem;
+      font-size: 0.79rem;
+      font-weight: 600;
+      border-radius: 9999px;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .pill-btn.active, .pill-btn:hover {
+      background-color: var(--border-highlight);
+      color: #ffffff;
+    }
+
+    .pill-btn.active {
+      border-color: var(--accent-green);
+      color: var(--accent-green);
+      background-color: rgba(16, 185, 129, 0.12);
+    }
+
+    .quick-jump {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.825rem;
+      color: var(--text-muted);
+    }
+
+    .quick-jump select {
+      background-color: var(--bg-primary);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      border-radius: 0.45rem;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.825rem;
+      outline: none;
+      cursor: pointer;
+    }
+
+    .table-container-card {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      overflow: hidden;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.25);
+    }
+
+    .table-scroll-area {
+      position: relative;
+      max-height: 68vh;
+      overflow: auto;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border-color) transparent;
+    }
+
+    .table-scroll-area::-webkit-scrollbar {
+      width: 7px;
+      height: 7px;
+    }
+
+    .table-scroll-area::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 4px;
+    }
+
+    .tracker-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      text-align: center;
+      font-size: 0.865rem;
+    }
+
+    .tracker-table th.col-header {
+      position: sticky;
+      top: 0;
+      z-index: 25;
+      background-color: var(--bg-secondary);
+      padding: 0.85rem 0.65rem;
+      font-weight: 700;
+      font-size: 0.83rem;
+      color: var(--text-sub);
+      border-bottom: 2px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    .sticky-day-header {
+      position: sticky;
+      top: 0;
+      left: 0;
+      z-index: 40 !important;
+      background-color: var(--bg-secondary);
+      border-right: 2px solid var(--border-color) !important;
+      border-bottom: 2px solid var(--border-color) !important;
+      min-width: 115px;
+      max-width: 135px;
+      box-shadow: 3px 0 6px -2px var(--sticky-shadow);
+    }
+
+    .day-col-cell {
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      background-color: var(--bg-secondary);
+      border-right: 2px solid var(--border-color);
+      font-weight: 800;
+      font-size: 0.84rem;
+      color: var(--text-main);
+      padding: 0.55rem 0.5rem;
+      white-space: nowrap;
+      box-shadow: 3px 0 6px -2px var(--sticky-shadow);
+      transition: background-color var(--transition-fast);
+    }
+
+    .day-sub-date {
+      display: block;
+      font-size: 0.69rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-top: 0.1rem;
+    }
+
+    .row-today .day-col-cell {
+      border-left: 4px solid var(--accent-blue);
+    }
+
+    .today-tag {
+      display: inline-block;
+      font-size: 0.62rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      background-color: var(--accent-blue);
+      color: #fff;
+      padding: 0.08rem 0.35rem;
+      border-radius: 4px;
+      margin-left: 0.25rem;
+      vertical-align: middle;
+    }
+
+    .tracker-table td {
+      padding: 0.55rem;
+      border-bottom: 1px solid var(--border-color);
+      border-right: 1px solid var(--border-color);
+      background-color: var(--cell-bg);
+      transition: background-color var(--transition-fast);
+      position: relative;
+    }
+
+    .tracker-table tr:hover td {
+      background-color: var(--cell-hover);
+    }
+
+    .tracker-table tr:hover .day-col-cell {
+      background-color: var(--bg-card-hover);
+    }
+
+    .row-perfect td {
+      background-color: rgba(16, 185, 129, 0.08);
+    }
+
+    .row-perfect .day-col-cell {
+      color: var(--accent-gold);
+    }
+
+    .task-label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      width: 100%;
+      height: 100%;
+      padding: 0.2rem;
+    }
+
+    .task-checkbox {
+      appearance: none;
+      -webkit-appearance: none;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 0.45rem;
+      border: 1.8px solid var(--border-color);
+      background-color: transparent;
+      cursor: pointer;
+      display: grid;
+      place-content: center;
+      transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+
+    .task-checkbox:hover {
+      border-color: var(--accent-green);
+      transform: scale(1.1);
+      box-shadow: 0 0 10px var(--accent-green-glow);
+    }
+
+    .task-checkbox::before {
+      content: "";
+      width: 0.65rem;
+      height: 0.38rem;
+      border-left: 2.3px solid #ffffff;
+      border-bottom: 2.3px solid #ffffff;
+      transform: rotate(-45deg) scale(0);
+      transform-origin: center center;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+      margin-top: -2px;
+    }
+
+    .task-checkbox:checked {
+      background-color: var(--accent-green);
+      border-color: var(--accent-green);
+      box-shadow: 0 0 10px var(--accent-green-glow);
+    }
+
+    .task-checkbox:checked::before {
+      transform: rotate(-45deg) scale(1);
+    }
+
+    .day-progress-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      transition: all var(--transition-fast);
+      min-width: 62px;
+      justify-content: center;
+    }
+
+    .badge-complete {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: var(--accent-green);
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    .badge-star {
+      color: var(--accent-gold);
+      font-size: 0.95rem;
+      display: inline-block;
+      animation: popStar 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes popStar {
+      0% { transform: scale(0); }
+      70% { transform: scale(1.3); }
+      100% { transform: scale(1); }
+    }
+
+    /* Modals */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      overflow-y: auto;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-card {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 0.85rem;
+      width: 100%;
+      max-width: 440px;
+      padding: 1.5rem;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5);
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal-card.modal-lg {
+      max-width: 600px;
+    }
+
+    .modal-title {
+      font-size: 1.2rem;
+      font-weight: 800;
+      margin-bottom: 0.35rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.85rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--text-sub);
+      margin-bottom: 0.35rem;
+    }
+
+    .form-input {
+      width: 100%;
+      background-color: var(--bg-primary);
+      border: 1px solid var(--border-color);
+      border-radius: 0.5rem;
+      padding: 0.55rem 0.75rem;
+      color: var(--text-main);
+      font-size: 0.875rem;
+      outline: none;
+      transition: border-color var(--transition-fast);
+    }
+
+    .form-input:focus {
+      border-color: var(--accent-blue);
+    }
+
+    .calculated-days-banner {
+      background-color: rgba(59, 130, 246, 0.12);
+      border: 1px solid rgba(59, 130, 246, 0.35);
+      color: #60a5fa;
+      padding: 0.55rem 0.85rem;
+      border-radius: 0.5rem;
+      font-size: 0.83rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .subjects-builder-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 210px;
+      overflow-y: auto;
+      padding-right: 0.25rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .subject-builder-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background-color: var(--bg-primary);
+      padding: 0.4rem 0.55rem;
+      border-radius: 0.5rem;
+      border: 1px solid var(--border-color);
+    }
+
+    .subject-builder-item input[type="text"] {
+      flex: 1;
+      background: transparent;
+      border: none;
+      color: var(--text-main);
+      font-size: 0.85rem;
+      font-weight: 600;
+      outline: none;
+    }
+
+    .subject-builder-item input[type="color"] {
+      width: 28px;
+      height: 28px;
+      border: none;
+      background: transparent;
+      cursor: pointer;
+      padding: 0;
+    }
+
+    .icon-btn-remove {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.3);
+      border-radius: 0.35rem;
+      width: 26px;
+      height: 26px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.8rem;
+      font-weight: 800;
+    }
+
+    .icon-btn-remove:hover {
+      background: var(--danger);
+      color: #fff;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-color);
+    }
+
+    /* Toast Notification */
+    .toast {
+      position: fixed;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      background-color: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--accent-green);
+      border-left: 4px solid var(--accent-green);
+      padding: 0.75rem 1.15rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 600;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      opacity: 0;
+      transform: translateY(10px);
+      pointer-events: none;
+      transition: all 0.25s ease;
+      z-index: 120;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    @media (max-width: 640px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Print Styles */
+    @media print {
+      body {
+        background-color: #ffffff !important;
+        color: #000000 !important;
+      }
+      .routine-switcher-bar,
+      .header-bar .btn-group,
+      .controls-panel,
+      .toast,
+      .modal-overlay {
+        display: none !important;
+      }
+      .app-container {
+        max-width: 100% !important;
+        padding: 0 !important;
+      }
+      .table-scroll-area {
+        max-height: none !important;
+        overflow: visible !important;
+      }
+      .table-container-card {
+        border: 1px solid #ccc !important;
+        box-shadow: none !important;
+      }
+      .tracker-table th, .tracker-table td {
+        border: 1px solid #bbb !important;
+        color: #000 !important;
+      }
+      .task-checkbox:checked {
+        background-color: #000 !important;
+        border-color: #000 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <input type="file" id="importInput" accept=".json" style="display: none;" onchange="handleFileImport(event)" />
+
+  <div class="app-container">
+
+    <!-- Multi-Routine Switcher & Creator Bar -->
+    <div class="routine-switcher-bar">
+      <div class="switcher-left">
+        <span class="switcher-label">🗂️ Active Routine:</span>
+        <select id="routineSelector" class="routine-select" onchange="switchRoutine(this.value)"></select>
+        <span id="activeDateRangeChip" class="date-range-chip" style="display: none;"></span>
+      </div>
+      <div class="btn-group">
+        <button class="btn btn-create" onclick="openRoutineModal('create')">
+          <span>➕</span>
+          <span>Create Custom Routine</span>
+        </button>
+        <button class="btn" onclick="openRoutineModal('edit')" title="Edit current routine name, dates or targets">
+          <span>✏️</span>
+          <span>Customize</span>
+        </button>
+        <button class="btn btn-danger" id="deleteRoutineBtn" onclick="deleteCurrentRoutine()" style="display: none;" title="Delete this custom routine">
+          <span>🗑️</span>
+        </button>
+      </div>
+    </div>
+
+    <header class="header-bar">
+      <div class="brand-title-wrap">
+        <div class="mission-pill">
+          <span>🏛️</span>
+          <span id="missionPillText">60-Day Banking Mission | Dedication & Consistency</span>
+        </div>
+        <h1 class="main-heading">
+          <span id="routineMainTitle">Banking by RWA</span>
+          <span class="gradient-text" id="routineSubTitle">(Shobhit Sir)</span>
+        </h1>
+        <p class="motivational-quote">
+          <span>🔱</span>
+          <span id="routineMotto">Bolo jai Babba ki 🙏</span>
+        </p>
+      </div>
+
+      <!-- Action Button Group -->
+      <div class="btn-group">
+        <button class="btn" id="themeToggleBtn" onclick="toggleTheme()" title="Toggle Dark/Light Theme">
+          <span id="themeIcon">☀️</span>
+          <span id="themeText">Light</span>
+        </button>
+
+        <button class="btn" onclick="exportData()" title="Backup all routines and checklist data to JSON">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Export
+        </button>
+
+        <button class="btn" onclick="triggerImport()" title="Import checklist backup file">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          Import
+        </button>
+
+        <button class="btn" onclick="window.print()" title="Print tracker or save as PDF">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2-2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+          Print / PDF
+        </button>
+
+        <button class="btn btn-danger" onclick="openResetModal()" title="Clear all checkboxes in current routine">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+          Reset Routine
+        </button>
+      </div>
+    </header>
+
+    <!-- Primary Analytics -->
+    <section class="metrics-grid">
+      <div class="metric-card">
+        <div class="metric-title">
+          <span>Overall Mission Progress</span>
+          <span>🎯</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-big-number" id="overallPercentage">0%</span>
+          <span class="metric-small-sub" id="overallCount">0 / 360 targets</span>
+        </div>
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" id="overallBar"></div>
+        </div>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-title">
+          <span id="perfectCardTitle">Perfect Days</span>
+          <span>🏆</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-big-number" id="perfectDaysCount" style="color: var(--accent-gold);">0</span>
+          <span class="metric-small-sub" id="perfectDaysOutText">out of 60 days</span>
+        </div>
+        <p style="font-size: 0.77rem; color: var(--text-muted); margin-top: 0.25rem;" id="perfectCardDesc">
+          Complete all daily targets for selection rank!
+        </p>
+      </div>
+
+      <div class="metric-card">
+        <div class="metric-title">
+          <span>Active Streak</span>
+          <span>🔥</span>
+        </div>
+        <div class="metric-value-row">
+          <span class="metric-big-number" id="streakCount">0 Days</span>
+          <span class="metric-small-sub">consecutive active</span>
+        </div>
+        <p style="font-size: 0.77rem; color: var(--text-muted); margin-top: 0.25rem;">
+          Consistency brings mastery. Never skip consecutive days!
+        </p>
+      </div>
+    </section>
+
+    <!-- Individual Subject Progress Breakdown -->
+    <div class="subject-stat-grid" id="subjectStatsContainer"></div>
+
+    <!-- Table Toolbar -->
+    <div class="controls-panel">
+      <div class="filter-pills">
+        <span style="font-size: 0.79rem; font-weight: 700; color: var(--text-muted); margin-right: 0.25rem;">View:</span>
+        <button class="pill-btn active" id="filterAllBtn" data-filter="all" onclick="setFilter('all', this)">All Days</button>
+        <button class="pill-btn" data-filter="incomplete" onclick="setFilter('incomplete', this)">Pending Days</button>
+        <button class="pill-btn" id="filterCompletedBtn" data-filter="completed" onclick="setFilter('completed', this)">Completed ⭐</button>
+      </div>
+
+      <div class="quick-jump">
+        <label for="daySelect">Jump to Day:</label>
+        <select id="daySelect" onchange="jumpToDay(this.value)">
+          <option value="">Select Day...</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Dynamic Grid Table -->
+    <div class="table-container-card">
+      <div class="table-scroll-area" id="scrollArea">
+        <table class="tracker-table" id="trackerTable">
+          <thead id="tableHead"></thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create / Edit Custom Routine Modal -->
+  <div class="modal-overlay" id="routineModal">
+    <div class="modal-card modal-lg">
+      <div class="modal-title">
+        <span id="routineModalHeading">✨ Create Custom Routine</span>
+        <button class="btn" style="padding: 0.2rem 0.55rem;" onclick="closeRoutineModal()">✕</button>
+      </div>
+      <p class="modal-body" style="margin-bottom: 1rem;">
+        Set your custom routine name, start & end dates, and customize daily target columns.
+      </p>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Routine / Exam Title *</label>
+          <input type="text" id="inputRoutineTitle" class="form-input" placeholder="e.g., SBI PO Target / JPSC Prep" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subtitle / Mentor / Tag</label>
+          <input type="text" id="inputRoutineSubtitle" class="form-input" placeholder="e.g., (Self Study Plan)" />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Motivational Motto / Quote</label>
+        <input type="text" id="inputRoutineMotto" class="form-input" placeholder="e.g., Bolo jai Babba ki 🙏 / Abki Baar Selection Paar!" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Starting Date *</label>
+          <input type="date" id="inputStartDate" class="form-input" onchange="onDateInputChange()" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ending Date *</label>
+          <input type="date" id="inputEndDate" class="form-input" onchange="onDateInputChange()" />
+        </div>
+      </div>
+
+      <div class="calculated-days-banner" id="dateSummaryBanner">
+        <span id="calculatedDaysText">📅 Total Duration: 60 Days</span>
+        <span style="font-size: 0.75rem; opacity: 0.85;">(Max 365 days)</span>
+      </div>
+
+      <div class="form-group">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.45rem;">
+          <label class="form-label" style="margin-bottom: 0;">Daily Targets / Subjects *</label>
+          <button type="button" class="btn" style="padding: 0.25rem 0.65rem; font-size: 0.76rem;" onclick="addSubjectBuilderRow()">
+            ➕ Add Target Column
+          </button>
+        </div>
+        <div class="subjects-builder-list" id="subjectsBuilderList"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn" onclick="closeRoutineModal()">Cancel</button>
+        <button class="btn btn-create" onclick="saveRoutineFromModal()">💾 Save Routine</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reset Confirmation Modal -->
+  <div class="modal-overlay" id="resetModal">
+    <div class="modal-card">
+      <h3 class="modal-title">Reset Current Routine?</h3>
+      <p class="modal-body" id="resetModalText">
+        This will clear all checkboxes in the currently selected routine. Other routines will remain untouched.
+      </p>
+      <div class="modal-actions">
+        <button class="btn" onclick="closeResetModal()">Cancel</button>
+        <button class="btn btn-primary" style="background-color: var(--danger);" onclick="confirmResetAll()">Yes, Reset</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast">
+    <span id="toastIcon">💾</span>
+    <span id="toastMsg">Progress saved automatically!</span>
+  </div>
+
+  <script>
+    const DEFAULT_SUBJECTS = [
+      { id: "math", name: "📐 Math (Quant)", color: "#60a5fa" },
+      { id: "reasoning", name: "🧠 Reasoning", color: "#a78bfa" },
+      { id: "english", name: "📖 English", color: "#34d399" },
+      { id: "hindi", name: "🇮🇳 Hindi", color: "#f472b6" },
+      { id: "computer", name: "💻 Computer", color: "#38bdf8" },
+      { id: "ga", name: "🌍 GA (Banking)", color: "#fbbf24" }
+    ];
+
+    const LEGACY_STORAGE_KEY = "banking_rwa_60days_tracker_v2";
+    const MULTI_STORAGE_KEY = "banking_rwa_multi_routines_v3";
+    const THEME_KEY = "banking_rwa_theme";
+
+    let appData = {
+      activeRoutineId: "default_rwa_60",
+      routines: []
+    };
+
+    let activeFilter = "all";
+    let modalMode = "create";
+    let tempBuilderSubjects = [];
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initTheme();
+      loadAllRoutines();
+      renderRoutineSelector();
+      renderActiveRoutineUI();
+    });
+
+    /* Theme Engine */
+    function initTheme() {
+      const savedTheme = localStorage.getItem(THEME_KEY) || "dark";
+      applyTheme(savedTheme);
+    }
+
+    function toggleTheme() {
+      const isDark = document.documentElement.classList.contains("dark");
+      const nextTheme = isDark ? "light" : "dark";
+      applyTheme(nextTheme);
+      localStorage.setItem(THEME_KEY, nextTheme);
+    }
+
+    function applyTheme(theme) {
+      const icon = document.getElementById("themeIcon");
+      const text = document.getElementById("themeText");
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+        document.documentElement.classList.remove("light");
+        if (icon) icon.textContent = "☀️";
+        if (text) text.textContent = "Light";
+      } else {
+        document.documentElement.classList.add("light");
+        document.documentElement.classList.remove("dark");
+        if (icon) icon.textContent = "🌙";
+        if (text) text.textContent = "Dark";
+      }
+    }
+
+    /* Helper: Format YYYY-MM-DD to readable short date */
+    function formatReadableDate(dateStr, addDays = 0) {
+      if (!dateStr) return "";
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return "";
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      dt.setDate(dt.getDate() + addDays);
+      return dt.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
+    }
+
+    function isSameLocalDay(dateStr, addDays = 0) {
+      if (!dateStr) return false;
+      const parts = dateStr.split("-");
+      if (parts.length !== 3) return false;
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      dt.setDate(dt.getDate() + addDays);
+      const now = new Date();
+      return (
+        dt.getFullYear() === now.getFullYear() &&
+        dt.getMonth() === now.getMonth() &&
+        dt.getDate() === now.getDate()
+      );
+    }
+
+    function getTodayISO() {
+      const now = new Date();
+      const yyyy = now.getFullYear();
+      const mm = String(now.getMonth() + 1).padStart(2, "0");
+      const dd = String(now.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function addDaysISO(startISO, daysToAdd) {
+      const parts = startISO.split("-");
+      const dt = new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+      dt.setDate(dt.getDate() + daysToAdd);
+      const yyyy = dt.getFullYear();
+      const mm = String(dt.getMonth() + 1).padStart(2, "0");
+      const dd = String(dt.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    /* Load & Migrate State */
+    function loadAllRoutines() {
+      try {
+        const raw = localStorage.getItem(MULTI_STORAGE_KEY);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && Array.isArray(parsed.routines) && parsed.routines.length > 0) {
+            appData = parsed;
+            return;
+          }
+        }
+
+        // Check legacy 60-day storage for seamless migration
+        let legacyState = {};
+        const legacyRaw = localStorage.getItem(LEGACY_STORAGE_KEY);
+        if (legacyRaw) {
+          legacyState = JSON.parse(legacyRaw) || {};
+        }
+
+        const todayISO = getTodayISO();
+        const end60ISO = addDaysISO(todayISO, 59);
+
+        const defaultRoutine = {
+          id: "default_rwa_60",
+          title: "Banking by RWA",
+          subtitle: "(Shobhit Sir)",
+          motto: "Bolo jai Babba ki 🙏",
+          startDate: todayISO,
+          endDate: end60ISO,
+          totalDays: 60,
+          subjects: JSON.parse(JSON.stringify(DEFAULT_SUBJECTS)),
+          state: legacyState
+        };
+
+        appData = {
+          activeRoutineId: defaultRoutine.id,
+          routines: [defaultRoutine]
+        };
+        saveAllRoutines();
+      } catch (e) {
+        console.error("Failed to initialize routines", e);
+      }
+    }
+
+    function saveAllRoutines() {
+      try {
+        localStorage.setItem(MULTI_STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+        console.error("Failed to save routines", e);
+      }
+    }
+
+    function getActiveRoutine() {
+      let found = appData.routines.find(r => r.id === appData.activeRoutineId);
+      if (!found) {
+        found = appData.routines[0];
+        appData.activeRoutineId = found.id;
+      }
+      return found;
+    }
+
+    /* Routine Switcher UI */
+    function renderRoutineSelector() {
+      const select = document.getElementById("routineSelector");
+      select.innerHTML = "";
+
+      appData.routines.forEach(r => {
+        const opt = document.createElement("option");
+        opt.value = r.id;
+        opt.textContent = `${r.title} ${r.subtitle ? r.subtitle : ""} (${r.totalDays} Days)`;
+        if (r.id === appData.activeRoutineId) opt.selected = true;
+        select.appendChild(opt);
+      });
+
+      const deleteBtn = document.getElementById("deleteRoutineBtn");
+      if (appData.routines.length > 1) {
+        deleteBtn.style.display = "inline-flex";
+      } else {
+        deleteBtn.style.display = "none";
+      }
+    }
+
+    function switchRoutine(routineId) {
+      appData.activeRoutineId = routineId;
+      saveAllRoutines();
+      renderRoutineSelector();
+      renderActiveRoutineUI();
+      showToast("Switched routine!", "🗂️");
+    }
+
+    /* Render Entire Active Routine */
+    function renderActiveRoutineUI() {
+      const routine = getActiveRoutine();
+
+      document.getElementById("routineMainTitle").textContent = routine.title;
+      document.getElementById("routineSubTitle").textContent = routine.subtitle || "";
+      document.getElementById("routineMotto").textContent = routine.motto || "Consistency is the key to success!";
+      document.getElementById("missionPillText").textContent = `${routine.totalDays}-Day Target Mission | Dedication & Consistency`;
+
+      const dateChip = document.getElementById("activeDateRangeChip");
+      if (routine.startDate && routine.endDate) {
+        dateChip.style.display = "inline-flex";
+        dateChip.textContent = `📅 ${formatReadableDate(routine.startDate, 0)} → ${formatReadableDate(routine.endDate, 0)} (${routine.totalDays} Days)`;
+      } else {
+        dateChip.style.display = "none";
+      }
+
+      const subCount = routine.subjects.length;
+      document.getElementById("perfectCardTitle").textContent = `${subCount}/${subCount} Perfect Days`;
+      document.getElementById("perfectDaysOutText").textContent = `out of ${routine.totalDays} days`;
+      document.getElementById("perfectCardDesc").textContent = `Complete all ${subCount} targets each day for top rank!`;
+      document.getElementById("filterAllBtn").textContent = `All ${routine.totalDays} Days`;
+      document.getElementById("filterCompletedBtn").textContent = `Completed (${subCount}/${subCount}) ⭐`;
+
+      buildSubjectSummaryCards();
+      buildTable();
+      populateJumpDropdown();
+      updateAllStats();
+      applyRowFilters();
+    }
+
+    function buildSubjectSummaryCards() {
+      const routine = getActiveRoutine();
+      const container = document.getElementById("subjectStatsContainer");
+      container.innerHTML = "";
+
+      routine.subjects.forEach(sub => {
+        const card = document.createElement("div");
+        card.className = "subject-stat-card";
+        card.innerHTML = `
+          <div class="subject-stat-name">
+            <span style="color: ${sub.color};">${sub.name}</span>
+            <span id="stat-pct-${sub.id}">0%</span>
+          </div>
+          <div class="subject-stat-val" id="stat-cnt-${sub.id}">0 / ${routine.totalDays} days</div>
+          <div class="progress-bar-bg" style="height: 4px; margin-top: 0.15rem;">
+            <div class="subject-mini-fill" id="stat-bar-${sub.id}" style="background-color: ${sub.color};"></div>
+          </div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    function buildTable() {
+      const routine = getActiveRoutine();
+      const thead = document.getElementById("tableHead");
+      const tbody = document.getElementById("tableBody");
+
+      // Build Header
+      let headHTML = `<tr><th class="col-header sticky-day-header">Day / Date</th>`;
+      routine.subjects.forEach(sub => {
+        headHTML += `<th class="col-header" style="color: ${sub.color};">${sub.name}</th>`;
+      });
+      headHTML += `<th class="col-header" style="color: var(--accent-green); min-width: 95px;">Day Score</th></tr>`;
+      thead.innerHTML = headHTML;
+
+      // Build Rows
+      tbody.innerHTML = "";
+      for (let day = 1; day <= routine.totalDays; day++) {
+        const tr = document.createElement("tr");
+        tr.id = `row-day-${day}`;
+
+        const isToday = isSameLocalDay(routine.startDate, day - 1);
+        if (isToday) tr.classList.add("row-today");
+
+        const dayCell = document.createElement("td");
+        dayCell.className = "day-col-cell";
+
+        const dateSubStr = routine.startDate ? formatReadableDate(routine.startDate, day - 1) : "";
+        dayCell.innerHTML = `
+          <div>Day ${day}${isToday ? '<span class="today-tag">Today</span>' : ''}</div>
+          ${dateSubStr ? `<span class="day-sub-date">${dateSubStr}</span>` : ''}
+        `;
+        tr.appendChild(dayCell);
+
+        routine.subjects.forEach(sub => {
+          const td = document.createElement("td");
+          const key = `${day}_${sub.id}`;
+          const isChecked = Boolean(routine.state[key]);
+
+          const label = document.createElement("label");
+          label.className = "task-label";
+          label.setAttribute("aria-label", `Day ${day} ${sub.name}`);
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.className = "task-checkbox";
+          checkbox.checked = isChecked;
+
+          checkbox.addEventListener("change", (e) => {
+            onCheckboxChange(day, sub.id, e.target.checked);
+          });
+
+          label.appendChild(checkbox);
+          td.appendChild(label);
+          tr.appendChild(td);
+        });
+
+        const scoreCell = document.createElement("td");
+        scoreCell.id = `score-cell-${day}`;
+        tr.appendChild(scoreCell);
+
+        tbody.appendChild(tr);
+        updateDayRowScore(day);
+      }
+    }
+
+    function onCheckboxChange(day, subjectId, isChecked) {
+      const routine = getActiveRoutine();
+      const key = `${day}_${subjectId}`;
+      if (isChecked) {
+        routine.state[key] = true;
+      } else {
+        delete routine.state[key];
+      }
+
+      saveAllRoutines();
+      updateDayRowScore(day);
+      updateAllStats();
+      applyRowFilters();
+    }
+
+    function updateDayRowScore(day) {
+      const routine = getActiveRoutine();
+      const row = document.getElementById(`row-day-${day}`);
+      const scoreCell = document.getElementById(`score-cell-${day}`);
+      if (!row || !scoreCell) return;
+
+      let count = 0;
+      const totalSubs = routine.subjects.length;
+      routine.subjects.forEach(sub => {
+        if (routine.state[`${day}_${sub.id}`]) count++;
+      });
+
+      const isComplete = (count === totalSubs && totalSubs > 0);
+
+      if (isComplete) {
+        row.classList.add("row-perfect");
+        scoreCell.innerHTML = `
+          <span class="day-progress-badge badge-complete">
+            <span class="badge-star">★</span> ${count}/${totalSubs}
+          </span>
+        `;
+      } else {
+        row.classList.remove("row-perfect");
+        scoreCell.innerHTML = `
+          <span class="day-progress-badge">
+            ${count}/${totalSubs}
+          </span>
+        `;
+      }
+    }
+
+    function updateAllStats() {
+      const routine = getActiveRoutine();
+      const totalDays = routine.totalDays;
+      const subLen = routine.subjects.length;
+
+      let totalChecked = 0;
+      let perfectDays = 0;
+      let longestStreak = 0;
+      let tempStreak = 0;
+
+      const subjectTallies = {};
+      routine.subjects.forEach(s => subjectTallies[s.id] = 0);
+
+      const minForActiveStreak = Math.max(1, Math.ceil(subLen / 2));
+
+      for (let day = 1; day <= totalDays; day++) {
+        let dayChecks = 0;
+        routine.subjects.forEach(s => {
+          if (routine.state[`${day}_${s.id}`]) {
+            dayChecks++;
+            subjectTallies[s.id]++;
+          }
+        });
+
+        totalChecked += dayChecks;
+        if (dayChecks === subLen && subLen > 0) {
+          perfectDays++;
+        }
+
+        if (dayChecks >= minForActiveStreak) {
+          tempStreak++;
+          if (tempStreak > longestStreak) longestStreak = tempStreak;
+        } else {
+          tempStreak = 0;
+        }
+      }
+
+      const totalPossible = totalDays * subLen;
+      const overallPct = totalPossible > 0 ? Math.round((totalChecked / totalPossible) * 100) : 0;
+
+      document.getElementById("overallPercentage").textContent = `${overallPct}%`;
+      document.getElementById("overallCount").textContent = `${totalChecked} / ${totalPossible} targets`;
+      document.getElementById("overallBar").style.width = `${overallPct}%`;
+      document.getElementById("perfectDaysCount").textContent = perfectDays;
+      document.getElementById("streakCount").textContent = `${longestStreak} Days`;
+
+      routine.subjects.forEach(s => {
+        const subCount = subjectTallies[s.id] || 0;
+        const subPct = totalDays > 0 ? Math.round((subCount / totalDays) * 100) : 0;
+        const pctEl = document.getElementById(`stat-pct-${s.id}`);
+        const cntEl = document.getElementById(`stat-cnt-${s.id}`);
+        const barEl = document.getElementById(`stat-bar-${s.id}`);
+
+        if (pctEl) pctEl.textContent = `${subPct}%`;
+        if (cntEl) cntEl.textContent = `${subCount} / ${totalDays} days`;
+        if (barEl) barEl.style.width = `${subPct}%`;
+      });
+    }
+
+    /* Filter rows */
+    function setFilter(type, btnElement) {
+      activeFilter = type;
+      document.querySelectorAll(".pill-btn").forEach(btn => btn.classList.remove("active"));
+      if (btnElement) btnElement.classList.add("active");
+      applyRowFilters();
+    }
+
+    function applyRowFilters() {
+      const routine = getActiveRoutine();
+      const subLen = routine.subjects.length;
+
+      for (let day = 1; day <= routine.totalDays; day++) {
+        const row = document.getElementById(`row-day-${day}`);
+        if (!row) continue;
+
+        let dayCount = 0;
+        routine.subjects.forEach(s => {
+          if (routine.state[`${day}_${s.id}`]) dayCount++;
+        });
+
+        const isComplete = (dayCount === subLen);
+
+        if (activeFilter === "all") {
+          row.style.display = "";
+        } else if (activeFilter === "completed") {
+          row.style.display = isComplete ? "" : "none";
+        } else if (activeFilter === "incomplete") {
+          row.style.display = !isComplete ? "" : "none";
+        }
+      }
+    }
+
+    /* Dropdown Jump */
+    function populateJumpDropdown() {
+      const routine = getActiveRoutine();
+      const select = document.getElementById("daySelect");
+      select.innerHTML = `<option value="">Select Day...</option>`;
+
+      for (let day = 1; day <= routine.totalDays; day++) {
+        const opt = document.createElement("option");
+        opt.value = day;
+        const dStr = routine.startDate ? ` (${formatReadableDate(routine.startDate, day - 1)})` : "";
+        opt.textContent = `Day ${day}${dStr}`;
+        select.appendChild(opt);
+      }
+    }
+
+    function jumpToDay(dayNum) {
+      if (!dayNum) return;
+      const targetRow = document.getElementById(`row-day-${dayNum}`);
+      if (targetRow) {
+        targetRow.style.display = "";
+        targetRow.scrollIntoView({ behavior: "smooth", block: "center" });
+
+        targetRow.style.transition = "background-color 0.4s ease";
+        const originalBg = targetRow.style.backgroundColor;
+        targetRow.style.backgroundColor = "rgba(59, 130, 246, 0.28)";
+        setTimeout(() => {
+          targetRow.style.backgroundColor = originalBg;
+        }, 1200);
+      }
+    }
+
+    /* Custom Routine Creator / Editor Modal */
+    function openRoutineModal(mode) {
+      modalMode = mode;
+      const modal = document.getElementById("routineModal");
+      const heading = document.getElementById("routineModalHeading");
+
+      if (mode === "create") {
+        heading.textContent = "✨ Create Custom Routine";
+        document.getElementById("inputRoutineTitle").value = "";
+        document.getElementById("inputRoutineSubtitle").value = "";
+        document.getElementById("inputRoutineMotto").value = "Consistency brings mastery! 🔥";
+
+        const startISO = getTodayISO();
+        const endISO = addDaysISO(startISO, 29); // Default 30 days for new routine
+        document.getElementById("inputStartDate").value = startISO;
+        document.getElementById("inputEndDate").value = endISO;
+
+        tempBuilderSubjects = JSON.parse(JSON.stringify(DEFAULT_SUBJECTS));
+      } else {
+        const cur = getActiveRoutine();
+        heading.textContent = "✏️ Customize Current Routine";
+        document.getElementById("inputRoutineTitle").value = cur.title;
+        document.getElementById("inputRoutineSubtitle").value = cur.subtitle || "";
+        document.getElementById("inputRoutineMotto").value = cur.motto || "";
+
+        const startISO = cur.startDate || getTodayISO();
+        const endISO = cur.endDate || addDaysISO(startISO, cur.totalDays - 1);
+        document.getElementById("inputStartDate").value = startISO;
+        document.getElementById("inputEndDate").value = endISO;
+
+        tempBuilderSubjects = JSON.parse(JSON.stringify(cur.subjects));
+      }
+
+      onDateInputChange();
+      renderSubjectsBuilder();
+      modal.classList.add("active");
+    }
+
+    function closeRoutineModal() {
+      document.getElementById("routineModal").classList.remove("active");
+    }
+
+    function calculateDaysBetween(startStr, endStr) {
+      if (!startStr || !endStr) return 0;
+      const sParts = startStr.split("-");
+      const eParts = endStr.split("-");
+      const sDate = new Date(Number(sParts[0]), Number(sParts[1]) - 1, Number(sParts[2]));
+      const eDate = new Date(Number(eParts[0]), Number(eParts[1]) - 1, Number(eParts[2]));
+      const diffTime = eDate.getTime() - sDate.getTime();
+      return Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+    }
+
+    function onDateInputChange() {
+      const startStr = document.getElementById("inputStartDate").value;
+      const endStr = document.getElementById("inputEndDate").value;
+      const textEl = document.getElementById("calculatedDaysText");
+
+      const days = calculateDaysBetween(startStr, endStr);
+      if (days <= 0) {
+        textEl.textContent = "⚠️ Ending date must be on or after Starting date!";
+        textEl.style.color = "#f87171";
+      } else if (days > 365) {
+        textEl.textContent = `⚠️ Duration (${days} days) exceeds 365-day maximum limit!`;
+        textEl.style.color = "#f87171";
+      } else {
+        textEl.textContent = `📅 Total Target Duration: ${days} ${days === 1 ? "Day" : "Days"}`;
+        textEl.style.color = "#60a5fa";
+      }
+    }
+
+    function renderSubjectsBuilder() {
+      const list = document.getElementById("subjectsBuilderList");
+      list.innerHTML = "";
+
+      tempBuilderSubjects.forEach((sub, idx) => {
+        const row = document.createElement("div");
+        row.className = "subject-builder-item";
+        row.innerHTML = `
+          <input type="color" value="${sub.color}" onchange="updateBuilderSubjectColor(${idx}, this.value)" title="Choose subject color" />
+          <input type="text" value="${sub.name}" placeholder="Target / Subject Name" oninput="updateBuilderSubjectName(${idx}, this.value)" />
+          <button type="button" class="icon-btn-remove" onclick="removeBuilderSubject(${idx})" title="Remove column">✕</button>
+        `;
+        list.appendChild(row);
+      });
+    }
+
+    function updateBuilderSubjectName(idx, val) {
+      if (tempBuilderSubjects[idx]) tempBuilderSubjects[idx].name = val;
+    }
+
+    function updateBuilderSubjectColor(idx, val) {
+      if (tempBuilderSubjects[idx]) tempBuilderSubjects[idx].color = val;
+    }
+
+    function removeBuilderSubject(idx) {
+      if (tempBuilderSubjects.length <= 1) {
+        showToast("At least 1 target column is required!", "⚠️");
+        return;
+      }
+      tempBuilderSubjects.splice(idx, 1);
+      renderSubjectsBuilder();
+    }
+
+    function addSubjectBuilderRow() {
+      const palette = ["#38bdf8", "#a78bfa", "#34d399", "#f472b6", "#fbbf24", "#fb923c", "#e879f9"];
+      const randomColor = palette[tempBuilderSubjects.length % palette.length];
+      tempBuilderSubjects.push({
+        id: "sub_" + Date.now() + "_" + Math.floor(Math.random() * 1000),
+        name: `📌 Target ${tempBuilderSubjects.length + 1}`,
+        color: randomColor
+      });
+      renderSubjectsBuilder();
+    }
+
+    function saveRoutineFromModal() {
+      const title = document.getElementById("inputRoutineTitle").value.trim();
+      const subtitle = document.getElementById("inputRoutineSubtitle").value.trim();
+      const motto = document.getElementById("inputRoutineMotto").value.trim();
+      const startDate = document.getElementById("inputStartDate").value;
+      const endDate = document.getElementById("inputEndDate").value;
+
+      if (!title) {
+        showToast("Please enter a Routine / Exam Title!", "⚠️");
+        return;
+      }
+
+      const totalDays = calculateDaysBetween(startDate, endDate);
+      if (totalDays <= 0 || totalDays > 365) {
+        showToast("Please select a valid Start and End date (1 to 365 days)!", "⚠️");
+        return;
+      }
+
+      const cleanedSubjects = tempBuilderSubjects
+        .map(s => ({ ...s, name: s.name.trim() }))
+        .filter(s => s.name.length > 0);
+
+      if (cleanedSubjects.length === 0) {
+        showToast("Please add at least one valid target/subject!", "⚠️");
+        return;
+      }
+
+      if (modalMode === "create") {
+        const newRoutine = {
+          id: "routine_" + Date.now(),
+          title,
+          subtitle,
+          motto: motto || "Bolo jai Babba ki 🙏",
+          startDate,
+          endDate,
+          totalDays,
+          subjects: cleanedSubjects,
+          state: {}
+        };
+        appData.routines.push(newRoutine);
+        appData.activeRoutineId = newRoutine.id;
+        showToast(`Created "${title}" (${totalDays} Days)!`, "🎉");
+      } else {
+        const cur = getActiveRoutine();
+        cur.title = title;
+        cur.subtitle = subtitle;
+        cur.motto = motto || "Bolo jai Babba ki 🙏";
+        cur.startDate = startDate;
+        cur.endDate = endDate;
+        cur.totalDays = totalDays;
+        cur.subjects = cleanedSubjects;
+        showToast(`Updated "${title}"!`, "✅");
+      }
+
+      saveAllRoutines();
+      renderRoutineSelector();
+      renderActiveRoutineUI();
+      closeRoutineModal();
+    }
+
+    function deleteCurrentRoutine() {
+      if (appData.routines.length <= 1) {
+        showToast("Cannot delete the only remaining routine!", "⚠️");
+        return;
+      }
+      const cur = getActiveRoutine();
+      if (!confirm(`Are you sure you want to delete routine "${cur.title}"?`)) return;
+
+      appData.routines = appData.routines.filter(r => r.id !== cur.id);
+      appData.activeRoutineId = appData.routines[0].id;
+      saveAllRoutines();
+      renderRoutineSelector();
+      renderActiveRoutineUI();
+      showToast("Routine deleted!", "🗑️");
+    }
+
+    /* Toast Notification */
+    function showToast(message, icon = "💾") {
+      const toast = document.getElementById("toast");
+      const toastMsg = document.getElementById("toastMsg");
+      const toastIcon = document.getElementById("toastIcon");
+
+      toastMsg.textContent = message;
+      toastIcon.textContent = icon;
+      toast.classList.add("show");
+
+      setTimeout(() => {
+        toast.classList.remove("show");
+      }, 2600);
+    }
+
+    /* Reset Confirmation Modal */
+    function openResetModal() {
+      const cur = getActiveRoutine();
+      document.getElementById("resetModalText").textContent =
+        `This will clear all checkboxes across all ${cur.totalDays} days in "${cur.title}". Other routines will remain safe.`;
+      document.getElementById("resetModal").classList.add("active");
+    }
+
+    function closeResetModal() {
+      document.getElementById("resetModal").classList.remove("active");
+    }
+
+    function confirmResetAll() {
+      const cur = getActiveRoutine();
+      cur.state = {};
+      saveAllRoutines();
+      buildTable();
+      updateAllStats();
+      applyRowFilters();
+      closeResetModal();
+      showToast(`Reset all targets in "${cur.title}"!`, "🧹");
+    }
+
+    /* JSON Backup & Export */
+    function exportData() {
+      const cur = getActiveRoutine();
+      const exportPayload = {
+        app: "Banking by RWA - Multi-Routine Tracker",
+        exportDate: new Date().toISOString(),
+        appData: appData
+      };
+
+      const safeTitle = cur.title.replace(/[^a-z0-9]/gi, "-").toLowerCase();
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(exportPayload, null, 2));
+      const downloadAnchor = document.createElement("a");
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", `Routine-Backup-${safeTitle}-${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+
+      showToast("All routines exported successfully!", "📥");
+    }
+
+    function triggerImport() {
+      document.getElementById("importInput").click();
+    }
+
+    function handleFileImport(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const parsed = JSON.parse(e.target.result);
+          if (parsed && parsed.appData && Array.isArray(parsed.appData.routines)) {
+            appData = parsed.appData;
+          } else if (parsed && typeof parsed.state === "object") {
+            // Backward compatibility with single-routine JSON files
+            const cur = getActiveRoutine();
+            cur.state = parsed.state;
+          } else {
+            throw new Error("Invalid format");
+          }
+
+          saveAllRoutines();
+          renderRoutineSelector();
+          renderActiveRoutineUI();
+          showToast("Backup restored successfully!", "✅");
+        } catch (err) {
+          showToast("Failed to import JSON file", "❌");
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+  </script>
+</body>
+</html>
